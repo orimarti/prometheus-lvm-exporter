@@ -4,5 +4,5 @@ This docker, reads information about LVM thin pools and exports VG's size and VG
 ## Running it
 The go binary will listen to port 9080 and serve metrics on the /metrics path, if we run it with docker, we should run the container as privileged.
 ```
-docker run --name=lvm-exporter --privileged=true -p 9080:9080 orimarti/lvm-pool-exporter
+docker run --name=lvm-exporter --privileged=true -p 9080:9080 orimarti/lvm-exporter
 ```
