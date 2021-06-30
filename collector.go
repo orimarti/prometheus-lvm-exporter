@@ -16,11 +16,11 @@ type lvmCollector struct {
 // LVM Collector contains VG size and VG free in MB
 func newLvmCollector() *lvmCollector {
 	return &lvmCollector{
-		vgFreeMetric: prometheus.NewDesc("lvm_vg_mb_free",
+		vgFreeMetric: prometheus.NewDesc("lvm_vg_free_bytes",
 			"Shows LVM VG free size in MB",
 			[]string{"vg_name"}, nil,
 		),
-		vgSizeMetric: prometheus.NewDesc("lvm_vg_mb_size",
+		vgSizeMetric: prometheus.NewDesc("lvm_vg_bytes_total",
 			"Shows LVM VG total size in MB",
 			[]string{"vg_name"}, nil,
 		),
@@ -34,7 +34,7 @@ func (collector *lvmCollector) Describe(ch chan<- *prometheus.Desc) {
 
 // LVM Collect, call OS command and set values
 func (collector *lvmCollector) Collect(ch chan<- prometheus.Metric) {
-	out, err := exec.Command("/sbin/vgs", "--units", "M", "--separator", ",", "-o", "vg_name,vg_free,vg_size", "--noheadings").Output()
+	out, err := exec.Command("/sbin/vgs", "--units", "B", "--separator", ",", "-o", "vg_name,vg_free,vg_size", "--noheadings").Output()
 	if err != nil {
 		log.Print(err)
 	}
@@ -42,11 +42,11 @@ func (collector *lvmCollector) Collect(ch chan<- prometheus.Metric) {
 	for _, line := range lines {
 		values := strings.Split(line,",")
 		if len(values)==3 {
-			free_size, err := strconv.ParseFloat(strings.Trim(values[1],"M"), 64)
+			free_size, err := strconv.ParseFloat(strings.Trim(values[1],"B"), 64)
 			if err!= nil {
 				log.Print(err)
 			} else {
-				total_size, err := strconv.ParseFloat(strings.Trim(values[2],"M"), 64)
+				total_size, err := strconv.ParseFloat(strings.Trim(values[2],"B"), 64)
 				if err!= nil {
 					log.Print(err)
 				} else {
